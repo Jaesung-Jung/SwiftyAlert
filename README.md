@@ -35,7 +35,7 @@ _ = await alert.present(from: vc)
 
 #### Handle Action
 
-When closed alert, result is `.done` or `.cancel`. `.done` contains a item passed in from the action. If passed no item, the type is `Void`.
+When closed alert, result is `.done` or `.cancel`. `.done` contains an item passed in from the action. If passed no item, the type is `Void`.
 
 ![](https://raw.githubusercontent.com/Jaesung-Jung/SwiftyAlert/main/Alert2.png)
 
