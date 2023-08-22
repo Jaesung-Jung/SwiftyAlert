@@ -30,7 +30,7 @@ import UIKit
 public struct Alert<Item> {
   public typealias PopoverPresentationHandler = (UIPopoverPresentationController) -> Void
 
-  typealias Modifier = (UIAlertController, CheckedContinuation<Item?, Never>) -> Void
+  typealias Modifier = (UIAlertController, CheckedContinuation<Item?, Never>?) -> Void
 
   let style: UIAlertController.Style
   let popoverPresentationHandler: PopoverPresentationHandler?
@@ -74,7 +74,7 @@ public struct Alert<Item> {
     Alert(style: style, popoverPresentationHandler: popoverPresentationHandler) { alert, continuation in
       modifier?(alert, continuation)
       let action = UIAlertAction(title: action.title, style: action.style) { _ in
-        continuation.resume(returning: action.item)
+        continuation?.resume(returning: action.item)
       }
       alert.addAction(action)
       alert.preferredAction = action
@@ -85,7 +85,7 @@ public struct Alert<Item> {
     Alert(style: style, popoverPresentationHandler: popoverPresentationHandler) { alert, continuation in
       modifier?(alert, continuation)
       let alertAction = UIAlertAction(title: action.title, style: action.style) { _ in
-        continuation.resume(returning: action.item)
+        continuation?.resume(returning: action.item)
       }
       alert.addAction(alertAction)
     }
@@ -122,6 +122,17 @@ public struct Alert<Item> {
     } else {
       return .cancel
     }
+  }
+}
+
+extension Alert where Item == Void {
+  public func present(from viewController: UIViewController, animated: Bool = true) {
+    let alertController = UIAlertController(title: nil, message: nil, preferredStyle: style)
+    if let popoverPresentationController = alertController.popoverPresentationController {
+      popoverPresentationHandler?(popoverPresentationController)
+    }
+    modifier?(alertController, nil)
+    viewController.present(alertController, animated: animated)
   }
 }
 

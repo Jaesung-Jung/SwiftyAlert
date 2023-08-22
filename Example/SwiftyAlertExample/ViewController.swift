@@ -45,6 +45,8 @@ class ViewController: UITableViewController {
         await alertWithDestructiveAction()
       case 2:
         await actionSheet()
+      case 3:
+        alertWithoutAsync()
       default:
         break
       }
@@ -75,6 +77,17 @@ extension ViewController {
     _ = await alert.present(from: self)
 
     print("finished")
+  }
+
+  func alertWithoutAsync() {
+    let alert = Alert(style: .alert)
+      .title("Title")
+      .message("Message")
+      .action(.default("Done"))
+
+    alert.present(from: self)
+
+    print("presented")
   }
 
   func alertWithDestructiveAction() async {

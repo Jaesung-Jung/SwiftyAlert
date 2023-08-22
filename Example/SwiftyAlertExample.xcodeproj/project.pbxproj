@@ -69,8 +69,10 @@
 				4BEDB29828D35F09000F7367 /* Assets.xcassets */,
 				4BEDB29D28D35F09000F7367 /* Info.plist */,
 			);
+			indentWidth = 2;
 			path = SwiftyAlertExample;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		4BEDB2B128D36519000F7367 /* SwiftyAlert */ = {
 			isa = PBXGroup;
