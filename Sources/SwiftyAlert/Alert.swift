@@ -28,7 +28,11 @@ import UIKit
 // MARK: - Alert
 
 public struct Alert<Item> {
+  #if os(tvOS)
+  public typealias PopoverPresentationHandler = () -> Void
+  #else
   public typealias PopoverPresentationHandler = (UIPopoverPresentationController) -> Void
+  #endif
 
   typealias Modifier = (UIAlertController, CheckedContinuation<Item?, Never>?) -> Void
 
@@ -99,6 +103,7 @@ public struct Alert<Item> {
     }
   }
 
+  #if os(iOS)
   public func popoverPresentation(_ configurationHandler: @escaping PopoverPresentationHandler) -> Self {
     if style == .actionSheet {
       return Alert(style: style, popoverPresentationHandler: configurationHandler, modifier: modifier)
@@ -106,13 +111,16 @@ public struct Alert<Item> {
       return self
     }
   }
+  #endif
 
   @MainActor
   public func present(from viewController: UIViewController, animated: Bool = true) async -> Alert<Item>.Result {
     let alertController = UIAlertController(title: nil, message: nil, preferredStyle: style)
+    #if os(iOS)
     if let popoverPresentationController = alertController.popoverPresentationController {
       popoverPresentationHandler?(popoverPresentationController)
     }
+    #endif
     let item = await withCheckedContinuation { continuation in
       modifier?(alertController, continuation)
       viewController.present(alertController, animated: animated)
@@ -128,9 +136,11 @@ public struct Alert<Item> {
 extension Alert where Item == Void {
   public func present(from viewController: UIViewController, animated: Bool = true) {
     let alertController = UIAlertController(title: nil, message: nil, preferredStyle: style)
+    #if os(iOS)
     if let popoverPresentationController = alertController.popoverPresentationController {
       popoverPresentationHandler?(popoverPresentationController)
     }
+    #endif
     modifier?(alertController, nil)
     viewController.present(alertController, animated: animated)
   }
