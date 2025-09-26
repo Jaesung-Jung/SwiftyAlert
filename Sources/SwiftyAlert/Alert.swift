@@ -27,14 +27,14 @@ import UIKit
 
 // MARK: - Alert
 
-public struct Alert<Item> {
+public struct Alert<Item: Sendable>: Sendable {
   #if os(tvOS)
   public typealias PopoverPresentationHandler = () -> Void
   #else
-  public typealias PopoverPresentationHandler = (UIPopoverPresentationController) -> Void
+  public typealias PopoverPresentationHandler = @MainActor @Sendable (UIPopoverPresentationController) -> Void
   #endif
 
-  typealias Modifier = (UIAlertController, CheckedContinuation<Item?, Never>?) -> Void
+  typealias Modifier = @MainActor @Sendable (UIAlertController, CheckedContinuation<Item?, Never>?) -> Void
 
   let style: UIAlertController.Style
   let popoverPresentationHandler: PopoverPresentationHandler?
@@ -69,7 +69,7 @@ public struct Alert<Item> {
     }
   }
 
-  public func addTextField(_ configurationHandler: ((UITextField) -> Void)? = nil) -> TextFieldAlert<Item> {
+  public func addTextField(_ configurationHandler: (@MainActor @Sendable (UITextField) -> Void)? = nil) -> TextFieldAlert<Item> {
     TextFieldAlert(base: self, textChangeObserver: nil)
       .addTextField(configurationHandler)
   }
@@ -134,6 +134,7 @@ public struct Alert<Item> {
 }
 
 extension Alert where Item == Void {
+  @MainActor
   public func present(from viewController: UIViewController, animated: Bool = true) {
     let alertController = UIAlertController(title: nil, message: nil, preferredStyle: style)
     #if os(iOS)
@@ -149,7 +150,7 @@ extension Alert where Item == Void {
 // MARK: - Alert.Action
 
 extension Alert {
-  public struct Action {
+  public struct Action: Sendable {
     let title: String
     let style: UIAlertAction.Style
     let item: Item?

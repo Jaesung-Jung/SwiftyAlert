@@ -25,7 +25,7 @@
 
 import UIKit
 
-public struct TextFieldAlert<Item> {
+public struct TextFieldAlert<Item: Sendable>: Sendable {
   let base: Alert<Item>
   let textChangeObserver: TextChangeObserver?
 
@@ -43,7 +43,7 @@ public struct TextFieldAlert<Item> {
     )
   }
 
-  public func addTextField(_ configurationHandler: ((UITextField) -> Void)? = nil) -> Self {
+  public func addTextField(_ configurationHandler: (@MainActor @Sendable (UITextField) -> Void)? = nil) -> Self {
     TextFieldAlert(
       base: Alert(style: base.style, popoverPresentationHandler: nil) {
         base.modifier?($0, $1)
@@ -108,7 +108,7 @@ extension TextFieldAlert {
 // MARK: - TextFieldAlert.TextChangeObserver
 
 extension TextFieldAlert {
-  class TextChangeObserver {
+  final class TextChangeObserver: @unchecked Sendable {
     let handler: ([String], [UIAlertAction]) -> Void
     var alertController: UIAlertController?
 
@@ -116,6 +116,7 @@ extension TextFieldAlert {
       self.handler = handler
     }
 
+    @MainActor
     func setAlertController(_ alertController: UIAlertController) {
       self.alertController = alertController
       for textField in alertController.textFields ?? [] {
@@ -124,6 +125,7 @@ extension TextFieldAlert {
       handleEditingChangedTextField()
     }
 
+    @MainActor
     @objc func handleEditingChangedTextField() {
       guard let textFields = alertController?.textFields, let actions = alertController?.actions else {
         return
